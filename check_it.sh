@@ -19,6 +19,9 @@ fi;
 # It would also be nice if our preferred editor is actally available
 bashep_check_cmd "${MY_EPIC_EDITOR}"
 
+#ssh keys: 
+#ssh-keygen -t ed25519
+
 # Check if git is available
 bashep_check_cmd "git"
 
@@ -42,9 +45,30 @@ else
 	cmp --silent  configs/tmux.conf ~/.tmux.conf || echo "Difference in CM and local tmux config detected."
 fi
 
+if [ ! -d ~/bin ]; then
+	echo "User bin directory not present, creating it"
+	mkdir ~/bin
+fi;
+
+if [ ! -f ~/bin/serport ]; then
+	echo "kermit helper script \"serport\" not found, copying it to ~/bin"
+	cp tools/serport ~/bin
+fi;
+
+groups | grep dialout > /dev/null || echo "user not part of the dialout group, you probably want to change that (sudo usermod -a -G dialout ${USER})"
+groups | grep vboxusers > /dev/null || echo "user not part of the vboxusers group, change this if using virtualbox (sudo usermod -a -G vboxusers ${USER})"
+
 bashep_check_buildenv
 echo "Missing build packages: ${MISSING_BUILD_ENV_PACKAGES}"
+
+bashep_check_devenv
+echo "Missing Development packages: ${MISSING_DEV_ENV_PACKAGES}"
+
+bashep_check_yoctoenv
+echo "Missing yocto packagees: ${MISSING_YOCTO_ENV_PACKAGES}"
 
 bashep_check_virtenv
 echo "Missing virtualisation packages: ${MISSING_VIRT_ENV_PACKAGES}"
 
+bashep_check_targetenv
+echo "Missing target packages: ${MISSING_TARGET_ENV_PACKAGES}"
